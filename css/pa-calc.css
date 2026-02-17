@@ -158,6 +158,26 @@
 
 .pa-add-btn { white-space: nowrap; }
 
+/* ── Copy All row ─────────────────────────────────────────────────────────── */
+.pa-copy-all-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+}
+
+.pa-copy-all-btn {
+    flex: none;
+    padding: 0.55rem 1.1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.pa-copy-all-hint {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
+
 /* ── PA Output Table ──────────────────────────────────────────────────────── */
 .pa-output-table .pa-output-cell {
     background: rgba(92, 219, 171, 0.04);

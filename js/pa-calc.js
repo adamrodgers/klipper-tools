@@ -102,16 +102,30 @@ function buildPaOutput() {
     const lh = PA_STATE.layerHeight;
     const outputWrap = document.getElementById('paOutputWrap');
 
-    let html = `<div class="pa-table-scroll"><table class="pa-table pa-output-table">`;
+    // Build all strings (no spaces, OrcaSlicer format)
+    const allStrings = [];
+    PA_STATE.accels.forEach((accel, ai) => {
+        PA_STATE.speeds.forEach((spd, si) => {
+            const flow = calcFlow(spd, lw, lh);
+            const pa = PA_STATE.pa[ai][si];
+            allStrings.push(`${pa},${flow},${accel}`);
+        });
+    });
 
-    // Header row 1: speed
+    let html = `<div class="pa-copy-all-row">
+        <button class="btn-primary pa-copy-all-btn" onclick="copyAllPa(this)">Copy All (OrcaSlicer)</button>
+        <span class="pa-copy-all-hint">${allStrings.length} values · one per line · PA,Flow,Accel</span>
+    </div>`;
+
+    html += `<div class="pa-table-scroll"><table class="pa-table pa-output-table">`;
+
     html += `<thead><tr><th class="pa-corner" rowspan="2">Accel ↓</th>`;
     PA_STATE.speeds.forEach((spd, si) => {
         const flow = calcFlow(spd, lw, lh);
         html += `<th class="pa-speed-col"><div class="pa-header-group"><div class="pa-header-label">Speed ${spd}</div><div class="pa-flow-sub">${flow} mm³/s</div></div></th>`;
     });
     html += `</tr><tr>`;
-    PA_STATE.speeds.forEach(() => html += `<th class="pa-flow-header" style="font-size:0.6rem;color:var(--text-muted)">PA, Flow, Accel</th>`);
+    PA_STATE.speeds.forEach(() => html += `<th class="pa-flow-header" style="font-size:0.6rem;color:var(--text-muted)">PA,Flow,Accel</th>`);
     html += `</tr></thead><tbody>`;
 
     PA_STATE.accels.forEach((accel, ai) => {
@@ -119,7 +133,7 @@ function buildPaOutput() {
         PA_STATE.speeds.forEach((spd, si) => {
             const flow = calcFlow(spd, lw, lh);
             const pa = PA_STATE.pa[ai][si];
-            const str = `${pa}, ${flow}, ${accel}`;
+            const str = `${pa},${flow},${accel}`;
             html += `<td class="pa-output-cell">
                 <span class="pa-output-str">${str}</span>
                 <button class="btn-small btn-copy pa-copy-btn" onclick="copyPaStr(this, '${str}')">Copy</button>
@@ -130,6 +144,24 @@ function buildPaOutput() {
 
     html += `</tbody></table></div>`;
     outputWrap.innerHTML = html;
+}
+
+function copyAllPa(btn) {
+    const lw = PA_STATE.lineWidth;
+    const lh = PA_STATE.layerHeight;
+    const lines = [];
+    PA_STATE.accels.forEach((accel, ai) => {
+        PA_STATE.speeds.forEach((spd, si) => {
+            const flow = calcFlow(spd, lw, lh);
+            const pa = PA_STATE.pa[ai][si];
+            lines.push(`${pa},${flow},${accel}`);
+        });
+    });
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+        btn.textContent = 'Copied!';
+        btn.style.background = 'var(--accent-dim)';
+        setTimeout(() => { btn.textContent = 'Copy All (OrcaSlicer)'; btn.style.background = ''; }, 2000);
+    });
 }
 
 function paAddSpeed() {
